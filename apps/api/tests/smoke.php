@@ -1,9 +1,12 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__) . '/src/bootstrap.php';
-if (!class_exists(\TalentHub\Application::class)) {
-    fwrite(STDERR, 'No se pudo cargar la aplicacion');
-    exit(1);
-}
-echo "SMOKE PHP OK\n"
-?>
+use TalentHub\Validator;
+use TalentHub\ApiException;
+assert_options(ASSERT_ACTIVE, 1);
+assert(Validator::documentId('abcdefgh1234') === 'abcdefgh1234');
+assert(Validator::text(['title' => ' Nuevo empleo '], 'title') === 'Nuevo empleo');
+$threw = false;
+try { Validator::documentId('../private'); } catch (ApiException) { $threw = true; }
+if (!$threw) { fwrite(STDERR, "ERROR: identificador inválido permitido\n"); exit(1); }
+echo "Smoke PHP OK\n";
